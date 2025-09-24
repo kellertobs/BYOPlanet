@@ -1,5 +1,5 @@
 % create output directory
-if ~exist(['./out/',runID],'dir'); mkdir(['./out/',runID]); end
+if ~exist(['../out/',runID],'dir'); mkdir(['../out/',runID]); end
 
 % initialise random number generator
 rng(seed);

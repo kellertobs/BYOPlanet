@@ -17,7 +17,7 @@ MPls  =  0.01;         % mean planetesimal mass [Earth Masses]
 MGgt  =  300;          % mass of gas giant [Earth Masses]
 MStr  =  3e5;          % mass of central star [Earth Masses]
 
-cls   = 0.01;          % effective collision radius [AU]
+cls   =  0.01;         % effective collision radius [AU]
 
 % run model
 run('../src/main');
