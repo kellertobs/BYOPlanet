@@ -5,12 +5,13 @@ init;
 while time-dt <= tend*yr
     
     % store previous position
+    Do = D;
     Xo = X;
     
     % calculate new orbital velocity
+    D = squareform(pdist(X,'euclidean')) + eps;
     for nj = 1:N
-        D  = sum((X-X(nj,:)).^2,2).^0.5 + 1e-16;
-        Fj = - (M.*M(nj))./D.^2 .* (X-X(nj,:))./D;
+        Fj = - (M.*M(nj))./D(:,nj).^2 .* (X-X(nj,:))./D(:,nj);
         V  = V + Fj./M .* dt;
     end
     V = V - V(1,:);
@@ -20,27 +21,31 @@ while time-dt <= tend*yr
     % detect collisions
     nj = 1;
     while nj < N
-        Do      = sum((Xo-Xo(nj,:)).^2,2).^0.5 + 1e-16;
-        D       = sum((X -X (nj,:)).^2,2).^0.5 + 1e-16;
-        ind     = (D+Do)./2 < cls;
+        ind     = (D(:,nj)+Do(:,nj))./2 < cls;
         ind(nj) = 0;
         ind     = find(ind>0);
         
         % merge collided bodies
         for i = 1:length(ind)
-            X(nj,:)   = ((M(ind(i)).*X(ind(i),:)) + M(nj).*X(nj,:))./(M(ind(i))+M(nj));
-            V(nj,:)   = ((M(ind(i)).*V(ind(i),:)) + M(nj).*V(nj,:))./(M(ind(i))+M(nj));
-            C(nj,:)   = ((M(ind(i)).*C(ind(i),:)) + M(nj).*C(nj,:))./(M(ind(i))+M(nj));
-            M(nj)     = M(ind(i))+ M(nj);
+            X(nj,:)  = ((M(ind(i)).*X(ind(i),:)) + M(nj).*X(nj,:))./(M(ind(i))+M(nj));
+            V(nj,:)  = ((M(ind(i)).*V(ind(i),:)) + M(nj).*V(nj,:))./(M(ind(i))+M(nj));
+            C(nj,:)  = ((M(ind(i)).*C(ind(i),:)) + M(nj).*C(nj,:))./(M(ind(i))+M(nj));
+            M(nj)    = M(ind(i))+ M(nj);
         end
         
         % remove consumed bodies
-        X(ind,:)  = [];
-        Xo(ind,:) = [];
-        V(ind,:)  = [];
-        C(ind,:)  = [];
-        M(ind)    = [];
-        N         = N-length(ind);
+        if ~isempty(ind)
+            X(ind,:)    = [];
+            Xo(ind,:)   = [];
+            D(ind,:)    = [];
+            D(:,ind)    = [];
+            Do(ind,:)   = [];
+            Do(:,ind)   = [];
+            V(ind,:)    = [];
+            C(ind,:)    = [];
+            M(ind)      = [];
+            N           = N-length(ind);
+        end
 
         CLS = CLS + length(ind); % update collision counter
         nj  = nj+1; % move to check collisions for next body

@@ -7,6 +7,7 @@ rng(seed);
 % initialise body mass and position
 M  = [MStr; MGgt; min(MPls*100,max(MPls/100,normrnd(MPls,MPls/5,N-2,1)))];  % body mass
 X  = [0,0,0; 5,0,0; randn(N-2,3).*[6,6,1/3]];  % body position
+D  = squareform(pdist(X,'euclidean')) + eps;  % mutual distance matrix
 r  = sum((X-X(1,:)).^2,2).^0.5 + eps^2;  % radial distance to sun
 
 % initialise body composition (metal = 1, rock = 2; ice = 3)
