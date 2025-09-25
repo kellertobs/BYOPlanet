@@ -36,7 +36,7 @@ xlabel('Distance [AU]','FontSize',15)
 ylabel('Distance [AU]','FontSize',15)
 
 drawnow;
-print(gcf,['../out/',runID,'/',runID,'_top_',int2str(k/nop)],'-dpdf','-vector','-fillpage');
+print(gcf,['../out/',runID,'/',runID,'_top_',int2str(step/nop)],'-dpdf','-vector','-fillpage');
 
 
 % Figure 2: radial disk view
@@ -84,7 +84,7 @@ title('Accretionary Disk – Radial View','FontSize',15);
 xlabel('Radial Distance [AU]','FontSize',15)
 
 drawnow;
-print(gcf,['../out/',runID,'/',runID,'_rad_',int2str(k/nop)],'-dpdf','-vector','-fillpage');
+print(gcf,['../out/',runID,'/',runID,'_rad_',int2str(step/nop)],'-dpdf','-vector','-fillpage');
 
 
 % Figure 3: Planetary Zoo
@@ -111,4 +111,7 @@ text(-2.9,0.6,[int2str(CLS),' collisions'  ],'FontSize',13);
 
 drawnow;
 
-print(gcf,['../out/',runID,'/',runID,'_zoo_',int2str(k/nop)],'-dpdf','-vector','-fillpage');
+print(gcf,['../out/',runID,'/',runID,'_zoo_',int2str(step/nop)],'-dpdf','-vector','-fillpage');
+
+save(['../out/',runID,'/',runID,'_',int2str(step/nop)],'N','M','C','D','X','V','Fj','CLS','time','step');
+save(['../out/',runID,'/',runID,'_cont']           ,'N','M','C','D','X','V','Fj','CLS','time','step');

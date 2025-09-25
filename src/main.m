@@ -5,18 +5,24 @@ init;
 while time-dt <= tend*yr
     
     % store previous position
-    Do = D;
-    Xo = X;
+    Do  = D;
+    Fjo = Fj;
+    Xo  = X;
+    Vo  = V; 
     
     % calculate new orbital velocity
-    D = squareform(pdist(X,'euclidean')) + eps;
+    for i=1:2
+    Fj = zeros(size(M));
     for nj = 1:N
-        Fj = - (M.*M(nj))./D(:,nj).^2 .* (X-X(nj,:))./D(:,nj);
-        V  = V + Fj./M .* dt;
+        Fj = Fj - (M.*M(nj))./D(:,nj).^2 .* (X-X(nj,:))./D(:,nj);   % gravitational force
     end
-    V = V - V(1,:);
+    V = Vo + (Fj+Fjo)./M .* dt/2;                                   % force balance
     
-    X  = Xo + V.*dt;                         % update position of all bodies
+    X = Xo + (V+Vo).*dt/2;                                          % update position of all bodies
+    D = squareform(pdist(X,'euclidean')) + eps;                     % update N-body distances
+    end
+
+    X = X - X(1,:);  % keep sun stationary
 
     % detect collisions
     nj = 1;
@@ -35,13 +41,13 @@ while time-dt <= tend*yr
         
         % remove consumed bodies
         if ~isempty(ind)
+            V(ind,:)    = [];
+            Fj(ind,:)   = [];
             X(ind,:)    = [];
-            Xo(ind,:)   = [];
             D(ind,:)    = [];
             D(:,ind)    = [];
             Do(ind,:)   = [];
             Do(:,ind)   = [];
-            V(ind,:)    = [];
             C(ind,:)    = [];
             M(ind)      = [];
             N           = N-length(ind);
@@ -60,15 +66,15 @@ while time-dt <= tend*yr
     Rmtl = sum(M.*C(:,1:1)./[2      ]+1e-16,2).^(1/3);
     Rice = Rtot - Rrck - Rmtl;
 
-    if ~mod(k,10); fprintf(1,'   -- %d;  time = %4.2f years;  bodies = %d;  collisions = %d\n',k,time/yr,N,CLS); end
+    if ~mod(step,10); fprintf(1,'   -- %d;  time = %4.2f years;  bodies = %d;  collisions = %d\n',step,time/yr,N,CLS); end
     
     % plot and print model progress
-    if ~mod(k,nop) || time-dt >= tend*yr
+    if ~mod(step,nop) || time-dt >= tend*yr
         output;
     end
     
     % update time and step count
     time = time + dt;
-    k    = k + 1;
+    step = step + 1;
     
 end

@@ -1,14 +1,54 @@
 % create output directory
 if ~exist(['../out/',runID],'dir'); mkdir(['../out/',runID]); end
 
+if restart
+
+if     restart < 0  % restart from last continuation frame
+    name = ['../out/',runID,'/',runID,'_cont.mat'];
+elseif restart > 0  % restart from specified continuation frame
+    name = ['../out/',runID,'/',runID,'_',num2str(restart),'.mat'];
+end
+if exist(name,'file')
+    fprintf('\n  restart from %s \n\n',name);
+    load(name,'N','M','C','D','X','V','Fj','CLS','time','step');
+
+    % update radii
+    Rtot = sum(M.*C(:,1:3)./[2,1,0.5]+eps,2).^(1/3);
+    Rrck = sum(M.*C(:,1:2)./[2,1    ]+eps,2).^(1/3);
+    Rmtl = sum(M.*C(:,1:1)./[2      ]+eps,2).^(1/3);
+    Rsun = (M(1)/0.5).^(1/3);
+    Rggt = (M(2)/0.5).^(1/3);
+    Rear =    (1/1.5).^(1/3);
+
+    % calculate duration of 1 year (orbital period for body of M = 1, R = 1)
+    yr = 2*pi/sqrt(M(1));
+
+    % calculate time step size
+    dt = yr/100;
+
+    % update time and step count
+    time = time + dt;
+    step = step + 1;
+
+else; restart = 0; end
+
+end
+
+if ~restart
+
 % initialise random number generator
 rng(seed);
 
 % initialise body mass and position
 M  = [MStr; MGgt; min(MPls*100,max(MPls/100,normrnd(MPls,MPls/5,N-2,1)))];  % body mass
 X  = [0,0,0; 5,0,0; randn(N-2,3).*[6,6,1/3]];  % body position
-D  = squareform(pdist(X,'euclidean')) + eps;  % mutual distance matrix
 r  = sum((X-X(1,:)).^2,2).^0.5 + eps^2;  % radial distance to sun
+
+D  = squareform(pdist(X,'euclidean')) + eps;  % mutual distance matrix
+Fj = zeros(size(M));
+for nj = 1:N
+    Fj = Fj - (M.*M(nj))./D(:,nj).^2 .* (X-X(nj,:))./D(:,nj);   % gravitational force
+end
 
 % initialise body composition (metal = 1, rock = 2; ice = 3)
 Cmtl = min(1,max(0,0.5-r.^0.5./6 + randn(N,1)./100));
@@ -36,7 +76,12 @@ dt = yr/100;
 
 CLS  = 0;  % initialise collision count
 time = 0;  % initialise time
-k    = 0;  % initialise time step counter
+step = 0;  % initialise time step counter
+
+end
+
+Vo   = V;
+Xo   = X;
 
 % print start of simulation
 fprintf(1,'\n\n*****  Start B-Y-O Planet Simulation  *****\n\n')
