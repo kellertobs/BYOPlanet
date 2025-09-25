@@ -56,11 +56,11 @@ for n = 1:5
     ra = max(mean(r(I(J(1:5)+2)))+(r(ind)-mean(r(I(J(1:5)+2))))./1.2,ra+1);
     Xa = 2.5+X(ind,3).*2;
     line([r(ind),ra],[X(ind,3),Xa],'Color','k','LineWidth',1.5);
-    scatter(ra,Xa,(Rtot(ind)*3).^2.*SCL,[0,0,1],'filled'); hold on; box on; axis equal;
-    scatter(ra,Xa,(Rrck(ind)*3).^2.*SCL,[0,1,0],'filled');
-    scatter(ra,Xa,(Rmtl(ind)*3).^2.*SCL,[1,0,0],'filled');
+    scatter(ra,Xa,(Rtot(ind)*2).^2.*SCL,[0,0,1],'filled'); hold on; box on; axis equal;
+    scatter(ra,Xa,(Rrck(ind)*2).^2.*SCL,[0,1,0],'filled');
+    scatter(ra,Xa,(Rmtl(ind)*2).^2.*SCL,[1,0,0],'filled');
 end
-text(1.35,4,'most massive bodies (3x)','FontSize',13);
+text(1.35,4,'most massive bodies (2x)','FontSize',13);
 
 scatter(1.0,-1.3,Rear^2.*SCL,[0,0,0]);
 scatter(1.0,-2.0,Rggt^2.*scl(2),[0,0,0],'filled');
