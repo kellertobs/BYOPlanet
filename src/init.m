@@ -10,15 +10,12 @@ elseif restart > 0  % restart from specified continuation frame
 end
 if exist(name,'file')
     fprintf('\n  restart from %s \n\n',name);
-    load(name,'N','M','C','D','X','V','Fj','CLS','time','step');
+    load(name,'N','M','C','X','V','Fj','CLS','time','step');
 
     % update radii
-    Rtot = sum(M.*C(:,1:3)./[2,1,0.5]+eps,2).^(1/3);
-    Rrck = sum(M.*C(:,1:2)./[2,1    ]+eps,2).^(1/3);
-    Rmtl = sum(M.*C(:,1:1)./[2      ]+eps,2).^(1/3);
-    Rsun = (M(1)/0.5).^(1/3);
-    Rggt = (M(2)/0.5).^(1/3);
-    Rear =    (1/1.5).^(1/3);
+    Rear = 1;
+    [Rtot,Rmtl,Rrck,Rsun,Rggt] = get_radii(M,C);
+
 
     % calculate duration of 1 year (orbital period for body of M = 1, R = 1)
     yr = 2*pi/sqrt(M(1));
@@ -30,7 +27,9 @@ if exist(name,'file')
     time = time + dt;
     step = step + 1;
 
-else; restart = 0; end
+else
+    restart = 0; 
+end
 
 end
 
@@ -40,33 +39,28 @@ if ~restart
 rng(seed);
 
 % initialise body mass and position
-M  = [MStr; MGgt; min(MPls*100,max(MPls/100,normrnd(MPls,MPls/5,N-2,1)))];  % body mass
-X  = [0,0,0; 5,0,0; randn(N-2,3).*[6,6,1/3]];  % body position
+M  = [MStr; MGgt; min(MPls*100,max(MPls/100,normrnd(MPls,MPls/2,N-2,1)))];  % body mass
+X  = [0,0,0; 5,0,0; randn(N-2,3).*[7,7,0]];  % body position
 r  = sum((X-X(1,:)).^2,2).^0.5 + eps^2;  % radial distance to sun
+X(3:end,3) = sind(Incl).*r(3:end).*randn(N-2,1);
 
-D  = squareform(pdist(X,'euclidean')) + eps;  % mutual distance matrix
-Fj = zeros(size(M));
-for nj = 1:N
-    Fj = Fj - (M.*M(nj))./D(:,nj).^2 .* (X-X(nj,:))./D(:,nj);   % gravitational force
-end
+[Fj] = get_forces(M,X,N);
 
 % initialise body composition (metal = 1, rock = 2; ice = 3)
-Cmtl = min(1,max(0,0.5-r.^0.5./6 + randn(N,1)./100));
+Cmtl = min(1,max(0,0.65-r.^0.25/3.5) .* (1 + randn(N,1)./100));
 Crck = 1-Cmtl;
-Cice = min(30,max(0,3.*max(0,r-5).^0.5) .* (1 + randn(N,1)./20));
+Cice = min(10,max(0,max(0,r-5).^0.75) .* (1 + randn(N,1)./100));
 C    = [Cmtl,Crck,Cice]./(Cmtl+Crck+Cice);
+C(1,:) = [0 0 1];
+C(2,:) = [0.1 0.2 0.7];
 
 % calculate radii
-Rtot = sum(M.*C(:,1:3)./[2,1,0.5]+eps,2).^(1/3);
-Rrck = sum(M.*C(:,1:2)./[2,1    ]+eps,2).^(1/3);
-Rmtl = sum(M.*C(:,1:1)./[2      ]+eps,2).^(1/3);
-Rsun = (M(1)/0.5).^(1/3);
-Rggt = (M(2)/0.5).^(1/3);
-Rear =    (1/1.5).^(1/3);
+Rear = 1;  % Earth radius
+[Rtot,Rmtl,Rrck,Rsun,Rggt] = get_radii(M,C);
 
 % calculate initial orbital velocity
 R  = (X-X(1,:))./r;
-V  = sqrt(M(1)./r) .* [R(:,2),-R(:,1),R(:,3)] .* (1+randn(N,3).*[0 0 0;0 0 0;ones(N-2,1).*[0.1,0.1,0.5]]);
+V  = sqrt(M(1)./r) .* [R(:,2),-R(:,1),R(:,3)] .* (1+[0 0 0;0 0 0;randn(N-2,3)./10]);
 
 % calculate duration of 1 year (orbital period for body of M = 1, R = 1)
 yr = 2*pi/sqrt(M(1));

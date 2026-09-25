@@ -4,17 +4,17 @@ clear; close all; clc;
 % load default parameters
 par_default;
 
-runID   = 'byoplanet_N3000';   % change run identifier for every parameter test
+runID   = 'byoplanet_N1e4';   % change run identifier for every parameter test
 restart =  0;
-nop     =  200;          % plot/print output figures every nop time steps
+nop     =  500;          % plot/print output figures every nop time steps
 
 seed    =  15;           % set the random seed for reproducible results
 
-tend    =  1000;         % stopping time for testing, higher for full run
+tend    =  1e4;          % stopping time for testing, higher for full run
 
-N       =  3000;        % initial number of planetesimals
+N       =  10000;        % initial number of planetesimals
 
-MPls    =  0.03;         % mean planetesimal mass [Earth Masses]
+MPls    =  0.01;         % mean planetesimal mass [Earth Masses]
 MGgt    =  300;          % mass of gas giant [Earth Masses]
 MStr    =  3e5;          % mass of central star [Earth Masses]
 

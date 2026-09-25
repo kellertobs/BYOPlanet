@@ -1,18 +1,18 @@
 % plot and print output
 
 % set plotting scales
-SCL = 200;
-scl = [1/20,2];
+SCL = 100;
+scl = [1/100,1];
 
 
 % Figure 1: top-down disk view
-figure(1); clf; set(gcf,'Visible','on','PaperUnits','centimeters','PaperSize',[24,18]);
-rectangle('Position',[-1 -1  2  2],'Curvature',[1,1],'EdgeColor','k','LineStyle',':','LineWidth',2); hold on; box on; axis equal;
-rectangle('Position',[-5 -5 10 10],'Curvature',[1,1],'EdgeColor','k','LineStyle',':','LineWidth',2);
+figure(1); clf; set(gcf,'Visible','on','PaperUnits','centimeters','Units','centimeters','PaperSize',[24,18]);
+rectangle('Position',[-1 -1  2  2],'Curvature',[1,1],'EdgeColor','k','LineStyle',':','LineWidth',1.75); hold on; box on; axis equal;
+rectangle('Position',[-5 -5 10 10],'Curvature',[1,1],'EdgeColor','k','LineStyle',':','LineWidth',1.75);
+scatter(X(1:2,1),X(1:2,2),[Rsun,Rggt].^2.*scl,zeros(2,3),'filled');
 scatter(X(3:N,1),X(3:N,2),Rtot(3:N).^2.*SCL,[0,0,1],'filled');
 scatter(X(3:N,1),X(3:N,2),Rrck(3:N).^2.*SCL,[0,1,0],'filled');
 scatter(X(3:N,1),X(3:N,2),Rmtl(3:N).^2.*SCL,[1,0,0],'filled');
-scatter(X(1:2,1),X(1:2,2),[Rsun,Rggt].^2.*scl,zeros(2,3),'filled');
 
 [~,I] = sort(M,'descend');
 [~,J] = sort(r(I(3:7)),'ascend');
@@ -21,16 +21,16 @@ for n = 1:5
     scatter(X(ind,1),X(ind,2),(Rtot(ind)+0.01).^2.*SCL,[1,0,1],'LineWidth',1.5)
 end
 
-scatter(-9,-8,Rear^2.*SCL,[0,0,0]);
-scatter(-9,-9,Rggt^2.*scl(2),[0,0,0],'filled');
-text(-8,-8,'Earth','FontSize',13);
-text(-8,-9,'star, gas giant not to scale','FontSize',13);
+scatter(-11,-10,Rear^2.*SCL,[0,0,0]);
+scatter(-11,-11,Rggt^2.*scl(2),[0,0,0],'filled');
+text(-10,-10,'Earth','FontSize',13);
+text(-10,-11,'star, gas giant (not to scale)','FontSize',13);
 
 text(0.025,0.95,[num2str(time/yr,4),' years'],'Units','normalized','FontSize',13);
 text(0.025,0.90,[int2str(N  ),' bodies'    ],'Units','normalized','FontSize',13);
 text(0.025,0.85,[int2str(CLS),' collisions'],'Units','normalized','FontSize',13);
 
-axis([X(1,1)-10,X(1,1)+10,X(1,2)-10,X(1,2)+10]);
+axis([X(1,1)-12,X(1,1)+12,X(1,2)-12,X(1,2)+12]);
 title('Accretionary Disk – Top View','FontSize',15);
 xlabel('Distance [AU]','FontSize',15)
 ylabel('Distance [AU]','FontSize',15)
@@ -41,12 +41,12 @@ print(gcf,['../out/',runID,'/',runID,'_top_',int2str(step/nop)],'-dpdf','-vector
 
 % Figure 2: radial disk view
 figure(2); clf; set(gcf,'Visible','on','PaperUnits','centimeters','PaperSize',[24,18]);
-line([1,1],[-1,1],'Color','k','LineStyle',':','LineWidth',2); hold on; box on; axis equal;
-line([5,5],[-1,1],'Color','k','LineStyle',':','LineWidth',2); hold on; box on; axis equal;
-scatter(r(3:N),X(3:N,3),Rtot(3:N).^2.*SCL,[0,0,1],'filled'); hold on; box on; axis equal;
+line([1,1],[-1,1],'Color','k','LineStyle',':','LineWidth',1.75); hold on; box on; axis equal;
+line([5,5],[-1,1],'Color','k','LineStyle',':','LineWidth',1.75);
+scatter(r(1:2),X(1:2,3),[Rsun,Rggt].^2.*scl,zeros(2,3),'filled');
+scatter(r(3:N),X(3:N,3),Rtot(3:N).^2.*SCL,[0,0,1],'filled');
 scatter(r(3:N),X(3:N,3),Rrck(3:N).^2.*SCL,[0,1,0],'filled');
 scatter(r(3:N),X(3:N,3),Rmtl(3:N).^2.*SCL,[1,0,0],'filled');
-scatter(r(1:2),X(1:2,3),[Rsun,Rggt].^2.*scl,zeros(2,3),'filled');
 
 ra = 1;
 for n = 1:5
@@ -55,17 +55,17 @@ for n = 1:5
     a  = 0.25; r0 = 2.5;
     ra = max(mean(r(I(J(1:5)+2)))+(r(ind)-mean(r(I(J(1:5)+2))))./1.2,ra+1);
     Xa = 2.5+X(ind,3).*2;
-    line([r(ind),ra],[X(ind,3),Xa],'Color','k','LineWidth',1.5);
+    line([r(ind),ra],[X(ind,3),Xa],'Color','k','LineWidth',1);
     scatter(ra,Xa,(Rtot(ind)*2).^2.*SCL,[0,0,1],'filled'); hold on; box on; axis equal;
     scatter(ra,Xa,(Rrck(ind)*2).^2.*SCL,[0,1,0],'filled');
     scatter(ra,Xa,(Rmtl(ind)*2).^2.*SCL,[1,0,0],'filled');
 end
-text(1.35,4,'most massive bodies (2x)','FontSize',13);
+text(1.35,4,'most massive bodies (x2)','FontSize',13);
 
 scatter(1.0,-1.3,Rear^2.*SCL,[0,0,0]);
 scatter(1.0,-2.0,Rggt^2.*scl(2),[0,0,0],'filled');
 text(2,-1.3,'Earth','FontSize',13);
-text(2,-2.0,'star, gas giant not to scale','FontSize',13);
+text(2,-2.0,'star, gas giant (not to scale)','FontSize',13);
 
 text(0.5,6.0,[num2str(time/yr,4),' years'],'FontSize',13);
 text(0.5,5.4,[int2str(N  ),' bodies'      ],'FontSize',13);
@@ -97,21 +97,24 @@ for n = 1:5
     scatter(log10(M(ind)),log10(Rtot(ind)),(1+0.01).*SCL/2,[1,0,1],'LineWidth',1.5)
 end
 
-scatter(0,log10((1/1.5).^(1/3)),SCL/2,[0,0,0]);
+scatter(0,0,SCL/2,[0,0,0]);
 text(0.1,-0.1,'Earth','FontSize',13);
 
-axis([-3,1,-1.5,1.0]);
+scatter(log10(M(2)),log10(Rtot(2)),SCL/2,[0,0,0],'filled');
+text(log10(M(2)),log10(Rtot(2))-0.1,'gas giant','FontSize',13,'HorizontalAlignment','center');
+
+axis([-3,3,-1.5,1.5]);
 title('Planetary Zoo','FontSize',15);
 xlabel('log_{10} Planetary Mass [Earth Mass]','FontSize',15)
 ylabel('log_{10} Planetary Radius [Earth Radius]','FontSize',15)
 
-text(-2.9,0.9,[num2str(time/yr,4),' years'],'FontSize',13);
-text(-2.9,0.75,[int2str(N  ),' bodies'      ],'FontSize',13);
-text(-2.9,0.6,[int2str(CLS),' collisions'  ],'FontSize',13);
+text(-2.9,1.4,[num2str(time/yr,4),' years'],'FontSize',13);
+text(-2.9,1.25,[int2str(N  ),' bodies'      ],'FontSize',13);
+text(-2.9,1.1,[int2str(CLS),' collisions'  ],'FontSize',13);
 
 drawnow;
 
 print(gcf,['../out/',runID,'/',runID,'_zoo_',int2str(step/nop)],'-dpdf','-vector','-fillpage');
 
-save(['../out/',runID,'/',runID,'_',int2str(step/nop)],'N','M','C','D','X','V','Fj','CLS','time','step');
-save(['../out/',runID,'/',runID,'_cont']           ,'N','M','C','D','X','V','Fj','CLS','time','step');
+save(['../out/',runID,'/',runID,'_',int2str(step/nop)],'N','M','C','X','V','Fj','CLS','time','step');
+save(['../out/',runID,'/',runID,'_cont']           ,'N','M','C','X','V','Fj','CLS','time','step');
